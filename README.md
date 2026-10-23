@@ -14,7 +14,50 @@ An autonomous desk-cleaning robot built for **EK 210 (Fall 2025, Section A4, Gro
 
 States: `IDLE -> MOVING -> PATH_FINDING -> TURNING_LEFT / TURNING_RIGHT -> MOVING ... -> COMPLETE`
 
-![Code flow](docs/images/code-flow.png)
+Design flow chart (transcribed from Figure 7 of the [report](docs/EK210_Final_Report.pdf); original image: [code-flow.png](docs/images/code-flow.png)):
+
+```mermaid
+flowchart TD
+    classDef term fill:#e8f1ff,stroke:#3b6fd4,color:#111
+    classDef decision fill:#fff6dd,stroke:#c99a1c,color:#111
+    classDef action fill:#f4f4f4,stroke:#777,color:#111
+    classDef done fill:#e6f6e9,stroke:#2e8b47,color:#111
+
+    A([Robot powered]):::term --> B{Start signal<br/>recognized?}:::decision
+    B -- No --> B
+    B -- Yes --> C[Begin sensing]:::action
+    B -- Yes --> D[Turn on vacuum<br/>and roller]:::action
+    B -- Yes --> E[Turn on running<br/>indicator LED]:::action
+
+    C --> F[Move sensing arm<br/>to center]:::action
+    F --> G[Drive forward]:::action
+    F --> H{Edge sensed?}:::decision
+    H -- No --> H
+    H -- Yes --> I[Stop driving]:::action
+    I --> J{First edge?}:::decision
+
+    J -- Yes --> K[Rotate arm right]:::action
+    K --> L{Edge sensed?}:::decision
+    L -- No --> M[Turn 180° left]:::action
+    L -- Yes --> N[Turn 180° right]:::action
+
+    J -- No --> P{Previous turn<br/>to the right?}:::decision
+    P -- Yes --> Q[Rotate arm left]:::action
+    Q --> R{Edge sensed?}:::decision
+    R -- Yes --> M
+    R -- No --> Z
+    P -- No --> S[Rotate arm right]:::action
+    S --> T{Edge sensed?}:::decision
+    T -- Yes --> N
+    T -- No --> Z
+
+    M --> F
+    N --> F
+
+    Z[Turn off fan<br/>and vacuum]:::done --> Y[Switch indicator LED<br/>green to red]:::done --> X([Stop]):::term
+```
+
+> The shipped sketch implements this as a timed state machine, so it differs from the design chart: it stops after a fixed run time instead of when an edge check fails, turns toward whichever side is clear (left preferred) rather than doing 180-degree turns, and backs up if neither side is clear.
 
 ## Repo layout
 
