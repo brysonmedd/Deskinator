@@ -34,7 +34,7 @@ flowchart TD
     F --> H{Edge sensed?}:::decision
     H -- No --> H
     H -- Yes --> I[Stop driving]:::action
-    I --> J{First edge?}:::decision
+    H -- Yes --> J{First edge?}:::decision
 
     J -- Yes --> K[Rotate arm right]:::action
     K --> L{Edge sensed?}:::decision
